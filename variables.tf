@@ -1,6 +1,6 @@
 variable "parent" {
   type        = string
-  description = "Resource the policies are attached to: \"projects/<project-id-or-number>\", \"folders/<folder-number>\" or \"organizations/<org-number>\""
+  description = "Resource the policies are attached to: \"projects/{project-id-or-number}\", \"folders/{folder-number}\" or \"organizations/{org-number}\""
 
   validation {
     condition     = can(regex("^(projects/[a-z0-9-]{6,30}|folders/[0-9]+|organizations/[0-9]+)$", var.parent))
