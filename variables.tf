@@ -63,4 +63,11 @@ variable "policies" {
     ]))
     error_message = "Policy allow/deny values must be non-empty strings"
   }
+
+  validation {
+    condition = alltrue([
+      for k, v in var.policies : (v.allow == null && v.deny == null) || length(concat(coalesce(v.allow, []), coalesce(v.deny, []))) > 0
+    ])
+    error_message = "A list policy must give at least one allow or deny value; use allow_all or deny_all to allow or deny everything"
+  }
 }

@@ -1,0 +1,29 @@
+{
+  "scan_date": "2026-11-18T00:00:00Z",
+  "scan_path": ".",
+  "category": "all",
+  "findings": [
+    {
+      "id": "HOLDEN_AI_001",
+      "status": "fixed",
+      "first_seen": "2026-11-18",
+      "last_seen": "2026-11-18",
+      "unresolved_since": null,
+      "suppression_reason": null,
+      "principle": "reliability",
+      "severity": "LOW",
+      "confidence": "high",
+      "title": "var.policies accepts a list policy with empty allow/deny lists, producing a rule with no values",
+      "file": "variables.tf",
+      "line": 11,
+      "resource": "variable.policies",
+      "related_resources": ["google_org_policy_policy.values", "local.value_policies"],
+      "explanation": "local.value_policies selects a policy when allow or deny is non-null, and the 'exactly one rule kind' validation counts allow = [] as set, so { allow = [] } passes validation and plans. The resulting rule's values block carries no allowed or denied values, which the Org Policy API rejects (or, if the provider drops the empty block, a rule with no kind) at apply time. Principle is a best fit: this is an apply-time correctness bug.",
+      "remediation": "Add a validation requiring at least one allow or deny value whenever allow or deny is set.",
+      "fixable": true,
+      "fix": "validation {\n  condition = alltrue([\n    for k, v in var.policies : (v.allow == null && v.deny == null) || length(concat(coalesce(v.allow, []), coalesce(v.deny, []))) > 0\n  ])\n  error_message = \"A list policy must give at least one allow or deny value; use allow_all or deny_all to allow or deny everything\"\n}"
+    }
+  ],
+  "suggested_policies": [],
+  "suggested_suppressions": []
+}
